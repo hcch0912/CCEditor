@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+<head>
+  <title>video play</title>	
+  <meta charset="utf-8">
+
+  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="js/jquery-ui.css">
+  </head>
+</head>
+
+<body>
+    
+  <nav>
+    <ul class="nav-title">
+      <li><a >SubEditor</a></li>
+    </ul>
+    <ul>
+	    <li>
+	    	<b></b>
+	    </li>
+    </ul>
+    <ul>
+	    <li>
+	  
+	    </li>
+    </ul>
+    <ul>
+	    <li>
+	    	<b>download</b>
+	    </li>
+    </ul>
+  </nav>
+
+
+    </ul>
+  </div>
+
+<div class="container">
+	<div class="left-container" id="video-container">
+		<div class="banner" id="banner-video">
+			<input id="uploadVideo" type="file"  accept="video/*" hidden>
+			<a id="addVideo" onclick="addVideo()">Open Video</a> 
+		</div>
+		<video id="video" controls ontimeupdate="updateTime(this)"" >
+		</video> 
+	</div>
+	
+	<div class="right-container">
+		<div class="banner">
+			<input id="uploadFile" type="file" hidden>
+			<a id="addText" onclick="uploadText()" >Upload Text</a>
+			<img src="img/preview.png" align="right" onclick="preview()">
+		</div>
+		<div id="contentDiv" onclick="cancelSelect()" class="scroll">
+		<ol id="selectable"  >
+			<li>
+				<p class="timeNode">time</p>
+				<p class="textNode">hello<br>helllllll<br>hellll<br></p>
+			</li>
+		</ol>
+		</div>
+	<div class="footer">
+					<img src="img/add.png" onclick="addText()">
+					<img src="img/delete.png" align="right" onclick="deleteText()">
+					<img src="img/edit.png" align="right" onclick="editText()">
+					
+			
+	</div>
+	</div>
+
+</div>
+
+
+<div id="row2" class="container">
+
+	<div id="timeLine" class="left-container">
+		<p class="info" id="showTime">
+		</p>
+		<p class="info">
+			Keep clicking the text element during the period you want to add subtitle  in 
+		</p>
+
+
+	</div>
+	
+	<div id="setting" class="right-container">
+		Setting
+		<br>
+		<br>
+		<a>Color</a>
+		<select id="color" >
+		  <option value="red">red</option>
+		  <option value="black">black</option>
+		  <option value="white">white</option>
+		  <option value="yellow">yellow</option>
+		</select>
+		<a>Font</a>
+		<select id="font" >
+		  <option value="Arial">Arial</option>
+		  <option value="Bold">Bold</option>
+		</select>
+		
+		<a>Size</a>
+		<select id="size" >
+		  <option value="14">14</option>
+		  <option value="12">12</option>
+		  <option value="10">10</option>
+		  <option value="8">8</option>
+		</select>
+		<a>Position</a>
+		<select id="position" >
+		  <option value="bottom">bottom</option>
+		  <option value="top">top</option>
+		  <option value="left">left</option>
+		  <option value="right">right</option>
+		</select>
+
+	</div>
+
+</div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery-ui.js"></script>
+    <script src="js/index.js"></script>
+
+    
+</body>
+</html>
+
+
+
