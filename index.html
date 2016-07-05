@@ -30,8 +30,8 @@
 			<a id="addVideo" onclick="addVideo()">Open Video</a> 
 		</div>
 		<video id="video" controls ontimeupdate="updateTime(this)"" >
-			<track kind="subtitles" src="test.vtt" lable="Eng" default>
-			<track kind="subtitles" src="test.vtt" lable="Frenc">
+			<!-- <track kind="subtitles" src="test.vtt" lable="Eng" default> -->
+			
 		</video> 
 	</div>
 	
@@ -39,20 +39,26 @@
 		<div class="banner">
 			<input id="uploadFile" type="file" hidden>
 			<a id="addText" onclick="uploadText()" >Upload Text</a>
-			<img src="img/preview.png" align="right" onclick="preview()">
+			<img src="img/preview.png" align="right" onclick="preview()"
+			alt="alternative text" title="this will be displayed as a tooltip"
+			>
+
+			 
 		</div>
-		<div id="contentDiv" onclick="cancelSelect()" class="scroll">
-		<ol id="selectable"  >
-			<li>
-				<p class="timeNode">time</p>
-				<p class="textNode">hello<br>helllllll<br>hellll<br></p>
-			</li>
-		</ol>
+		<div id="contentDiv" class="scroll">
+		
 		</div>
 	<div class="footer">
-					<img src="img/add.png" onclick="addText()">
-					<img src="img/delete.png" align="right" onclick="deleteText()">
-					<img src="img/edit.png" align="right" onclick="editText()">
+					<img src="img/add.png" id="addText" onclick="addLine()">
+					<img src="img/delete.png" id="delete" align="right" onclick="deleteText()">
+					<img src="img/edit.png" id="edit" align="right" onclick="myFunction()">
+						  <div id="myDropdown" class="dropdown-content">
+						    <a onclick="editText()">text</a>
+						    <a onclick="editStartTime()">start</a>
+						    <a onclick="editEndTime()">end</a>
+
+						  </div>
+					
 					
 			
 	</div>
@@ -106,8 +112,10 @@
 		</select>
 
 	</div>
-	<img id="download" src="img/download.png">
+	
 </div>
+<img id="download" src="img/download.png">
+
 
 
     <script src="js/jquery.min.js"></script>
@@ -115,6 +123,7 @@
     <script src="js/index.js"></script>
     <script>if (window.module) module = window.module;</script>
     
+
 </body>
 </html>
 

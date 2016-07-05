@@ -31,7 +31,7 @@ function addVideo(){
   
     $('#uploadVideo').trigger('click');
     $('#uploadVideo').on('change',function(){
-      console.log("here");
+     
           var file = this.files[0]
           var type = file.type
           var videoNode = document.getElementById('video')
@@ -75,7 +75,7 @@ function drawTimeLine(videoNode){
 }
 
 function textProcess(file){
-    var parentNode=document.getElementById("selectable");
+    var parentNode=document.getElementById("contentDiv");
     if(parentNode.hasChildNodes()){
       parentNode.innerHTML="";
     }
@@ -87,22 +87,29 @@ function textProcess(file){
   }
 }
 
-$(function() {
-    $( "#selectable" ).selectable();
-  });
-
 
 
 function deleteText(){
-  var thisText=document.getElementsByClassName("ui-selected");
+  var thisText=document.getElementsByClassName("li-selected");
   var parentNode=thisText[0].parentNode;
   parentNode.removeChild(thisText[0]);
   
 
 }
 function editText(){
-  var thisLi=document.getElementsByClassName("ui-selected");
-  var thisText=thisLi[0].lastElementChild;
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[2];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+  thisText.onkeypress=function(){
+          if(this.onkeypress.arguments[0].charCode == 13){
+            this.setAttribute("contenteditable","false");
+          } 
+        }
+}
+function editStartTime(){
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[0];
   thisText.setAttribute("contenteditable","true");
   placeCaretAtEnd( thisText );
   thisText.onkeypress=function(){
@@ -112,29 +119,131 @@ function editText(){
         }
 }
 
+function editEndTime(){
+  var thisLi=document.getElementsByClassName("ui-selected");
+  var thisText=thisLi[0].children[1];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+  thisText.onkeypress=function(){
+          if(this.onkeypress.arguments[0].charCode == 13){
+            this.setAttribute("contenteditable","false");
+          } 
+        }
+}
+
+
 function createTextElement(text){
 
-        var liLiNode=document.createElement("li");
-        var timeNode=document.createElement("p");
+        var liLiNode=document.createElement("div");
+        var startTimeNode=document.createElement("p");
+        var startTimeHide=document.createElement("span");
+        var endTimeNode=document.createElement("p");
+        var endTimeHide=document.createElement("span");
         var textNode=document.createElement("p");
 
         textNode.innerHTML=text;
         textNode.className="textNode";
-        liLiNode.className="ui-widget-content";
-     
-        timeNode.className="timeNode";
-        timeNode.innerHTML="00:00:00.000 --> 00:00:00.000";
-        liLiNode.appendChild(timeNode);
+        liLiNode.className="oneline";
+        startTimeNode.className="startTimeNode";
+        endTimeNode.className="endTimeNode";
+        startTimeNode.onclick=function(){
+            
+              if(video.paused==false){
+                startTimeHide.innerText=video.currentTime;
+                var startTime= timeProcess(video.currentTime);
+                    this.innerText=startTime;
+              }else{
+                  video.currentTime=startTimeHide.innerText;
+              }
+        };
+        endTimeNode.onclick=function(){
+         
+              if(video.paused==false){
+                 endTimeHide.innerText=video.currentTime;
+                  var endTime= timeProcess(video.currentTime);
+                    this.innerText=endTime;
+               }else{
+                  video.currentTime=endTimeHide.innerText;
+               }
+        };
+        startTimeNode.innerHTML="00:00:00.000";
+        endTimeNode.innerHTML="00:00:00.000"
+        startTimeHide.hidden=true;
+        endTimeHide.hidden=true;
+        liLiNode.appendChild(startTimeNode);
+        liLiNode.appendChild(endTimeNode);
         liLiNode.appendChild(textNode);
+        
         return liLiNode;
         
 }
+function timeProcess(time){
+    if(time==0){
+      time="0.0"
+    }
+    var strings=time.toString().split(".");
+    var left=strings[0];
+    var right=strings[1].substring(0,3);
+    var hourString="00";
+    var minuteStirng="00";
+    var secondString="00";
+    var rightStirng="000";
 
-function addText(){
-   var parentNode=document.getElementById("selectable");
-   var thisLi=document.getElementsByClassName("ui-selected");
+    var hours=0;
+    var minutes=0;
+    var seconds=0;
+    if(left>60){
+      hours=left/3600;
+      var reminder=left-hours*3600;
+      minutes=reminder/60;
+      reminder=reminder-minutes*60;
+      seconds=reminder;
+    }else{
+      seconds=left;
+    }
+    if(hours!=0){
+        if(hours>=10){
+          hourString=hours;
+        }else{
+          hourString="0"+hours;
+        }
+    }
+    if(minutes!=0){
+      if(minutes>10){
+        minuteStirng=minutes;
+      }else{
+        minuteStirng="0"+minutes;
+      }
+    }
+    if(seconds!=0){
+      if(seconds>=10){
+        secondString=seconds;
+      }else{
+        secondString="0"+seconds;
+      }
+    }
+    if(right<100){
+        if(right<10){
+          rightStirng=right+"00";
+        }else{
+          rightStirng=right+"0";
+        }
+    }else{
+      rightStirng=right;
+    }
+    time=hourString+":"+minuteStirng+":"+secondString+"."+rightStirng;
+    return time;
+}
+
+
+function addLine(){
+
+   var parentNode=document.getElementById("contentDiv");
+   var thisLi=document.getElementsByClassName("li-selected");
    if(thisLi.length!=0){
-    parentNode.insertBefore(createTextElement(" "), parentNode.childNodes[0]);
+    parentNode.insertBefore(createTextElement(" "), thisLi[0]);
+   }else{
+    parentNode.appendChild(createTextElement(" "));
    }
    
 }
@@ -157,22 +266,20 @@ function placeCaretAtEnd(el) {
     }
 }
 
-function cancelSelect(){
-         $(".ui-selected").removeClass("ui-selected");
-}
-
 function preview(){
 
-  var parentNode=document.getElementById("selectable");
+  var parentNode=document.getElementById("contentDiv");
   var nodeList=parentNode.childNodes;
   var i=0;
 
   var startString="WEBVTT FILE"+"\n \n";
 
   for(;i<nodeList.length;i++){
-    var time=nodeList[i].children[0].innerText;
-    var text=nodeList[i].children[1].innerText;
-    var string=time+"\n"+text+"\n";
+    var startTime=nodeList[i].children[0].innerText;
+    var endTime=nodeList[i].children[1].innerText;
+    var text=nodeList[i].children[2].innerText;
+    
+    var string=startTime+"-->"+endTime+"\n"+text+"\n";
     startString=startString+string;
   }
   fs.writeFile("test.vtt", startString, function(err) {
@@ -189,3 +296,50 @@ function preview(){
   newTrack.lable="English";
   videoParent.appendChild(newTrack);
 }
+
+function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+
+  console.log(event.target);
+
+  if (!event.target.matches('#edit')) {
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    var i;
+    for (i = 0; i < dropdowns.length; i++) {
+      var openDropdown = dropdowns[i];
+      if (openDropdown.classList.contains('show')) {
+        openDropdown.classList.remove('show');
+      }
+    }
+  }
+
+  if(!event.target.matches(".oneline")&&
+    !event.target.matches("#edit")&&
+    !event.target.matches("#de lete")&&
+    !event.target.matches("#addText")){
+
+   $(".li-selected").removeClass("li-selected");
+  }
+ 
+ if(event.target.matches(".startTimeNode")
+  ||event.target.matches(".endTimeNode")
+  ||event.target.matches(".textNode")){
+    if($(".li-selected")){
+      $(".li-selected").removeClass("li-selected");
+    }
+     var parentNode=event.target.parentNode;
+     parentNode.className+=" li-selected";
+     
+ }
+
+
+}
+
+
+
+
