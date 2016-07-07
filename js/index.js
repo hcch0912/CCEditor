@@ -3,6 +3,7 @@ var fs = require('fs');
 const {dialog} = require('electron').remote;
 
 /*upload Txt into container panel*/
+
 function uploadText(){
 
    $('#uploadFile').trigger('click');
@@ -13,16 +14,126 @@ function uploadText(){
          all.done(function(){
       
          if (file) {
-            var reader = new FileReader();
-            reader.readAsText(file);
+
+          var reader = new FileReader();
+          reader.readAsText(file);
+          if(file.name.match("vtt")){
             reader.onload = function(e) {
-            textProcess(e.target.result);
+              textProcessVTT(e.target.result);
+           }
+                
+           }else if(file.name.match("txt")){
+            reader.onload = function(e) {
+              textProcess(e.target.result);
+           }
           };
         }
     });
   });
 }
 
+/* preprocess the text file to split the text by sentences*/
+
+function textProcess(file){
+  var parentNode=document.getElementById("contentDiv");
+  if(parentNode.hasChildNodes()){
+      parentNode.innerHTML="";
+    }
+  var splited=file.replace(/(\.+|\:|\!|\?|\!|\;|\,)(\"*|\'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|"); 
+  var i=0;
+  for(;i<splited.length;i++){
+        parentNode.appendChild(createTextElement("00:00:00.000","00:00:00.000",splited[i],""));
+  }
+}
+
+function textProcessVTT(file){
+  var parentNode=document.getElementById("contentDiv");
+  if(parentNode.hasChildNodes()){
+      parentNode.innerHTML="";
+  }
+  var splited=file.split("\n\n");
+  var i=0;
+  var commentTemp;
+  var  video=document.getElementById("video");
+        track = video.addTextTrack("captions", "English", "en");
+        track.mode="showing";
+  for(;i<splited.length;i++){
+    if(!splited[i].match("WEBVTT")&&!splited[i].match("STYLE")){
+        var comment;
+        var startTime;
+        var endTime;
+        var text;
+        if(splited[i].match("NOTE")){
+            commentTemp=splited[i].substring(splited[i].indexOf("NOTE")+4);
+        }else{
+
+         var a=splited[i].indexOf("-->");
+         startTime=splited[i].substring(0,a);
+         endTime=splited[i].substring(a+3,a+15);
+         text=splited[i].substring(a+16);
+         parentNode.appendChild(createTextElement(startTime,endTime,text,commentTemp));
+
+         track.addCue(new VTTCue(startTime.substring(startTime.length-6),endTime.substring(endTime.length-6),text));
+
+        }
+       
+     }
+  }
+  
+}
+function createTextElement(startTime,endTime,text,comment){
+        var liLiNode=document.createElement("div");
+        var startTimeNode=document.createElement("p");
+        var startTimeHide=document.createElement("span");
+        var endTimeNode=document.createElement("p");
+        var endTimeHide=document.createElement("span");
+        var textNode=document.createElement("p");
+        var textHide=document.createElement("span");
+        var commentNode=document.createElement("p");
+
+        textNode.innerHTML=text;
+        textNode.className="textNode";
+        liLiNode.className="oneline";
+        startTimeNode.className="startTimeNode";
+        endTimeNode.className="endTimeNode";
+        commentNode.className="commentNode"
+        startTimeNode.onclick=function(){
+            
+              if(video.paused==false){
+                startTimeHide.innerText=video.currentTime;
+                var startTime= timeProcess(video.currentTime);
+                    this.innerText=startTime;
+              }else{
+                  video.currentTime=startTimeHide.innerText;
+              }
+        };
+        endTimeNode.onclick=function(){
+         
+              if(video.paused==false){
+                 endTimeHide.innerText=video.currentTime;
+                  var endTime= timeProcess(video.currentTime);
+                    this.innerText=endTime;
+               }else{
+                  video.currentTime=endTimeHide.innerText;
+               }
+        };
+        startTimeNode.innerHTML=startTime;
+        endTimeNode.innerHTML=endTime;
+        startTimeHide.hidden=true;
+        endTimeHide.hidden=true;
+        textHide.hidden=true;
+        commentNode.innerHTML=comment;
+        liLiNode.appendChild(startTimeNode);
+        liLiNode.appendChild(startTimeHide);
+        liLiNode.appendChild(endTimeNode);
+        liLiNode.appendChild(endTimeHide);
+        liLiNode.appendChild(textNode);
+        liLiNode.appendChild(textHide);
+        liLiNode.appendChild(commentNode);
+        
+        return liLiNode;
+        
+}
 /*add video to the page and alter error if the file is not playable*/
 var URL = window.URL || window.webkitURL
 var displayMessage = function (message, isError) {
@@ -49,10 +160,11 @@ function addVideo(){
           var fileURL = URL.createObjectURL(file)
           videoNode.src = fileURL;
   });   
+
 }
 
-
 function updateTime(event){
+
             var showTime=document.getElementById("showTime");
             showTime.innerHTML=event.currentTime;
           };
@@ -101,6 +213,13 @@ function editEndTime(){
           } 
         }
 }
+/*Edit comment*/
+function editComment(){
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[6];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+}
 
 /*Add a new line to the container*/
 function addLine(){
@@ -127,7 +246,7 @@ function preview(){
   var videoParent=document.getElementById("video");
   var newTrack=document.createElement("track");
   newTrack.src="test.vtt";
-  newTrack.kind="subtitiles";
+  newTrack.kind="captions";
   newTrack.srclang="en";
   newTrack.lable="English";
   videoParent.appendChild(newTrack);
@@ -157,7 +276,8 @@ window.onclick = function(event) {
   if(!event.target.matches(".oneline")&&
     !event.target.matches("#edit")&&
     !event.target.matches("#de lete")&&
-    !event.target.matches("#addText")){
+    !event.target.matches("#addText")&&
+    !event.target.matches(".selectee")){
 
    $(".li-selected").removeClass("li-selected");
   }
@@ -170,7 +290,6 @@ window.onclick = function(event) {
     }
      var parentNode=event.target.parentNode;
      parentNode.className+=" li-selected";
-     
  }
 }
 
@@ -189,22 +308,31 @@ function saveFile(){
   });
 }
 
+function editStyle(){
+   $("#setting").removeClass("settingDisabled");
+}
+
+function saveEditing(){
+   var thisLi=document.getElementsByClassName("li-selected");
+
+   var eColor = document.getElementById("color");
+   var selectedColor= eColor.options[eColor.selectedIndex].text;
+   var eFont = document.getElementById("font");
+   var selectedFont= eFont.options[eFont.selectedIndex].text;
+   var eSize = document.getElementById("size");
+   var selectedSize= eSize.options[eSize.selectedIndex].text;
+   var ePosition = document.getElementById("position");
+   var selectedPosition= ePosition.options[ePosition.selectedIndex].text;
+
+   thisLi[0].children[5].innerText="<c."+
+                              selectedColor+"."
+                              +selectedFont+".size"+
+                              +selectedSize+
+                              ">";
+   $("#setting").addClass("settingDisabled");
+}
 
 /*Utilitied functions */
-
-/* preprocess the text file to split the text by sentences*/
-function textProcess(file){
-    var parentNode=document.getElementById("contentDiv");
-    if(parentNode.hasChildNodes()){
-      parentNode.innerHTML="";
-    }
-    var splited=file.replace(/(\.+|\:|\!|\?|\!|\;|\,)(\"*|\'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|"); 
-    var i=0;
-    for(;i<splited.length;i++){
-        
-        parentNode.appendChild(createTextElement(splited[i]));
-  }
-}
 
 
 /*transform the time in seconds into the format that VTT file needs*/
@@ -267,51 +395,7 @@ function timeProcess(time){
 }
 
 /*create a new line Element*/
-function createTextElement(text){
 
-        var liLiNode=document.createElement("div");
-        var startTimeNode=document.createElement("p");
-        var startTimeHide=document.createElement("span");
-        var endTimeNode=document.createElement("p");
-        var endTimeHide=document.createElement("span");
-        var textNode=document.createElement("p");
-
-        textNode.innerHTML=text;
-        textNode.className="textNode";
-        liLiNode.className="oneline";
-        startTimeNode.className="startTimeNode";
-        endTimeNode.className="endTimeNode";
-        startTimeNode.onclick=function(){
-            
-              if(video.paused==false){
-                startTimeHide.innerText=video.currentTime;
-                var startTime= timeProcess(video.currentTime);
-                    this.innerText=startTime;
-              }else{
-                  video.currentTime=startTimeHide.innerText;
-              }
-        };
-        endTimeNode.onclick=function(){
-         
-              if(video.paused==false){
-                 endTimeHide.innerText=video.currentTime;
-                  var endTime= timeProcess(video.currentTime);
-                    this.innerText=endTime;
-               }else{
-                  video.currentTime=endTimeHide.innerText;
-               }
-        };
-        startTimeNode.innerHTML="00:00:00.000";
-        endTimeNode.innerHTML="00:00:00.000"
-        startTimeHide.hidden=true;
-        endTimeHide.hidden=true;
-        liLiNode.appendChild(startTimeNode);
-        liLiNode.appendChild(endTimeNode);
-        liLiNode.appendChild(textNode);
-        
-        return liLiNode;
-        
-}
 /*extra content in container and make it vtt file format*/
 function extraText(){
   var parentNode=document.getElementById("contentDiv");
@@ -319,13 +403,16 @@ function extraText(){
   var i=0;
 
   var startString="WEBVTT FILE"+"\n \n";
-
   for(;i<nodeList.length;i++){
     var startTime=nodeList[i].children[0].innerText;
-    var endTime=nodeList[i].children[1].innerText;
-    var text=nodeList[i].children[2].innerText;
-    
-    var string=startTime+"-->"+endTime+"\n"+text+"\n";
+    var endTime=nodeList[i].children[2].innerText;
+    var text=nodeList[i].children[4].innerText;
+    var style=nodeList[i].children[5].innerText;
+    var comment=nodeList[i].children[6].innerText;
+    if(style){
+      text=style+text+"</c>"
+    }
+    var string="\nNOTE "+comment+"\n\n"+startTime+"-->"+endTime+"\n"+text+"\n";
     startString=startString+string;
   }
   return startString;
@@ -348,3 +435,11 @@ function placeCaretAtEnd(el) {
         textRange.select();
     }
 }
+
+$('#contentDiv').nuSelectable({
+  items: '.oneline',
+  selectionClass: 'nu-selection-box',
+  selectedClass: 'li-selected',
+  autoRefresh: true
+
+});

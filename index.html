@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/index.css">
   	<!-- Insert this line above script imports  -->
   <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-  <link rel="stylesheet" href="js/jquery-ui.css">
+
   </head>
 </head>
 
@@ -30,8 +30,7 @@
 			<a id="addVideo" onclick="addVideo()">Open Video</a> 
 		</div>
 		<video id="video" controls ontimeupdate="updateTime(this)"" >
-			<!-- <track kind="subtitles" src="test.vtt" lable="Eng" default> -->
-			
+			<track id="track" kind="captions" src="tet.vtt" lable="Eng" mode="showing">
 		</video> 
 	</div>
 	
@@ -53,10 +52,11 @@
 					<img src="img/delete.png" id="delete" align="right" onclick="deleteText()">
 					<img src="img/edit.png" id="edit" align="right" onclick="myFunction()">
 						  <div id="myDropdown" class="dropdown-content">
-						    <a onclick="editText()">text</a>
-						    <a onclick="editStartTime()">start</a>
-						    <a onclick="editEndTime()">end</a>
-
+						    <a onclick="editText()" class="selectee">text</a>
+						    <a onclick="editStartTime()" class="selectee">start</a>
+						    <a onclick="editEndTime()" class="selectee">end</a>
+						    <a onclick="editStyle()" class="selectee">Style</a>
+						    <a onclick="editComment()" class="seletee">Comment</a>
 						  </div>
 					
 					
@@ -79,38 +79,37 @@
 
 	</div>
 	
-	<div id="setting" class="right-container">
+	<div id="setting" class="right-container settingDisabled" >
 		Setting
 		<br>
-		<br>
 		<a>Color</a>
-		<select id="color" >
+		<select id="color" class="selectee">
 		  <option value="red">red</option>
-		  <option value="black">black</option>
+		  <option value="black">blue</option>
 		  <option value="white">white</option>
 		  <option value="yellow">yellow</option>
 		</select>
 		<a>Font</a>
-		<select id="font" >
-		  <option value="Arial">Arial</option>
-		  <option value="Bold">Bold</option>
+		<select id="font" class="selectee">
+		  <option value="Arial">italic</option>
+		  <option value="Bold">bold</option>
 		</select>
 		
 		<a>Size</a>
-		<select id="size" >
-		  <option value="14">14</option>
+		<select id="size" class="selectee">
 		  <option value="12">12</option>
-		  <option value="10">10</option>
+		  <option value="15">15</option>
+		  <option value="18">18</option>
 		  <option value="8">8</option>
 		</select>
 		<a>Position</a>
-		<select id="position" >
+		<select id="position" class="selectee">
 		  <option value="bottom">bottom</option>
 		  <option value="top">top</option>
 		  <option value="left">left</option>
 		  <option value="right">right</option>
 		</select>
-
+		<img id="saveEdit" src="img/save.png" onclick="saveEditing()" class="selectee">
 	</div>
 	
 </div>
@@ -119,7 +118,8 @@
 
 
     <script src="js/jquery.min.js"></script>
-    <script src="js/jquery-ui.js"></script>
+    <script src="js/jquery.nu-selectable.js"></script>
+  
     <script src="js/index.js"></script>
     <script>if (window.module) module = window.module;</script>
     

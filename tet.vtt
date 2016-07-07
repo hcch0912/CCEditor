@@ -1,0 +1,23 @@
+WEBVTT FILE
+ 
+
+NOTE this is comment1
+
+00:00:02.001-->00:00:02.522
+<c.red>hello</c>;
+
+NOTE this is comment2
+
+00:00:03.415-->00:00:04.388
+<c.blue>hello</c>;
+
+NOTE This is said by Tom
+
+00:00:05.011-->00:00:05.374
+I 
+
+00:00:06.383-->00:00:08.609
+am
+
+00:00:09.383-->00:00:012.609
+Tom

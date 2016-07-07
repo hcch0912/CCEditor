@@ -57,6 +57,35 @@ video{
 	height:285px;
 	width: 450px;
 }
+::cue(.red){
+	color:red;
+}
+::cue(.blue) {
+     color:blue;
+}
+::cue(.yellow){
+	color:yellow;
+}
+::cue(.white){
+	color:white;
+}
+::cue(.italic){
+	font-style: italic
+}
+::cue(.bold){
+	font-style: bold;
+}
+::(.size12){
+	font-size: 12px;
+}
+::(.size15){
+	font-size: 15px;
+}
+
+::(.size18){
+	font-size: 18px;
+}
+
 
 /**
 Left container 
@@ -79,7 +108,7 @@ Left container
 
 .li-selected{
 	background-color: #ff8000;
-	
+
 }
   #feedback { font-size: 1.4em; }
   #selectable .ui-selecting { background: #FECA40; }
@@ -92,7 +121,7 @@ Left container
 }
 .startTimeNode{
 	display: inline-block;
-	width:20%;
+	width:19%;
 	height: 100%;
     font-size: 14px;
     border-left: 1px solid black;
@@ -103,7 +132,7 @@ Left container
 }
 .textNode{
 	display: inline-block;
-	width:57%;
+	width:45%;
 	height: 100%;
     word-wrap: break-word;
     overflow: scroll;
@@ -115,7 +144,7 @@ Left container
 }
 .endTimeNode{
 	display: inline-block;
-	width:20%;
+	width:19%;
 	height: 100%;
     font-size: 14px;
     border-left: 1px solid black;
@@ -123,6 +152,16 @@ Left container
     overflow: scroll;
     margin:0;
   
+}
+.commentNode{
+    display: inline-block;
+	width:12%;
+	height: 100%;
+    font-size: 14px;
+    border-left: 1px solid black;
+    text-align: center;
+    overflow: scroll;
+    margin:0;
 }
 .footer{
 	background-color:white;
@@ -251,6 +290,18 @@ nav h1 {
 
 .show {display:block;}
 
+.settingDisabled{
+	pointer-events: none;
+    opacity: 0.4;
+}
+
+ .nu-selection-box {
+        border: 1px dotted #BBB;
+        background: rgba(0, 0, 0, 0.04);
+    }
 
 
+  #saveEdit{
 
+  		width: 20px;
+  }
