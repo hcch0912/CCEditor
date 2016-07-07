@@ -1,7 +1,7 @@
 <snippet>
-  <content><![CDATA[
-# ${1:Project Name}
-CC/Subtitles Editor for creating WebVTT files.Enable editors to create CC/Subtitles with GUI rather than writing complicated VTT codes.
+  <content>
+#CC/Subtitles Editor
+ For creating WebVTT files. Enable editors to create CC/Subtitles with GUI rather than writing complicated VTT codes.
 ## Installation
 DownLoad the Zip file and unzip it run the CCEditor.app (mac) CCEdit.exe(windows)
 ## Usage
@@ -26,6 +26,6 @@ DownLoad the Zip file and unzip it run the CCEditor.app (mac) CCEdit.exe(windows
 Not for commercial
 ## License
 Owned by Veronica Chen
-]]></content>
+</content>
   <tabTrigger>readme</tabTrigger>
 </snippet>
