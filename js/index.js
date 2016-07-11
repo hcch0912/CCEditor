@@ -57,6 +57,7 @@ function textProcessVTT(file){
   var  video=document.getElementById("video");
         track = video.addTextTrack("captions", "English", "en");
         track.mode="showing";
+
   for(;i<splited.length;i++){
     if(!splited[i].match("WEBVTT")&&!splited[i].match("STYLE")){
         var comment;
@@ -66,29 +67,35 @@ function textProcessVTT(file){
         if(splited[i].match("NOTE")){
             commentTemp=splited[i].substring(splited[i].indexOf("NOTE")+4);
         }else{
-
-         var a=splited[i].indexOf("-->");
-         startTime=splited[i].substring(0,a);
-         endTime=splited[i].substring(a+3,a+15);
-         text=splited[i].substring(a+16);
-         parentNode.appendChild(createTextElement(startTime,endTime,text,commentTemp));
-
-         track.addCue(new VTTCue(startTime.substring(startTime.length-6),endTime.substring(endTime.length-6),text));
-
+          if(!splited[i].match("line")&&!splited[i].match("position")){
+              var a=splited[i].indexOf("-->");
+              startTime=splited[i].substring(0,a);
+              endTime=splited[i].substring(a+3,a+15);
+              text=splited[i].substring(a+16);
+              parentNode.appendChild(createTextElement(startTime,endTime,text,commentTemp));
+         //add cue element to DOM
+              track.addCue(new VTTCue(reverseTime(startTime),reverseTime(endTime),text));
+          }
         }
        
      }
   }
   
 }
+/* transform formatted time to seconds*/
+function reverseTime(time){
+    var timeArr=time.split(":");
+    var right=timeArr[2].split(".")[1];
+    var second=timeArr[2].split(".")[0];
+    time=timeArr[0]*3600+timeArr[1]*60+second+"."+right;
+    return time;
+}
+
 function createTextElement(startTime,endTime,text,comment){
         var liLiNode=document.createElement("div");
         var startTimeNode=document.createElement("p");
-        var startTimeHide=document.createElement("span");
         var endTimeNode=document.createElement("p");
-        var endTimeHide=document.createElement("span");
         var textNode=document.createElement("p");
-        var textHide=document.createElement("span");
         var commentNode=document.createElement("p");
 
         textNode.innerHTML=text;
@@ -98,37 +105,27 @@ function createTextElement(startTime,endTime,text,comment){
         endTimeNode.className="endTimeNode";
         commentNode.className="commentNode"
         startTimeNode.onclick=function(){
-            
               if(video.paused==false){
-                startTimeHide.innerText=video.currentTime;
-                var startTime= timeProcess(video.currentTime);
+                    var startTime= timeProcess(video.currentTime);
                     this.innerText=startTime;
               }else{
-                  video.currentTime=startTimeHide.innerText;
+                    video.currentTime=reverseTime(startTimeNode.innerText);
               }
         };
         endTimeNode.onclick=function(){
-         
-              if(video.paused==false){
-                 endTimeHide.innerText=video.currentTime;
-                  var endTime= timeProcess(video.currentTime);
+               if(video.paused==false){
+                    var endTime= timeProcess(video.currentTime);
                     this.innerText=endTime;
                }else{
-                  video.currentTime=endTimeHide.innerText;
+                    video.currentTime=reverseTime(endTimeNode.innerText);
                }
         };
         startTimeNode.innerHTML=startTime;
         endTimeNode.innerHTML=endTime;
-        startTimeHide.hidden=true;
-        endTimeHide.hidden=true;
-        textHide.hidden=true;
         commentNode.innerHTML=comment;
         liLiNode.appendChild(startTimeNode);
-        liLiNode.appendChild(startTimeHide);
         liLiNode.appendChild(endTimeNode);
-        liLiNode.appendChild(endTimeHide);
         liLiNode.appendChild(textNode);
-        liLiNode.appendChild(textHide);
         liLiNode.appendChild(commentNode);
         
         return liLiNode;
@@ -152,8 +149,6 @@ function addVideo(){
           if (canPlay === '') canPlay = 'no'
           var message = 'Can play type "' + type + '": ' + canPlay
           var isError = canPlay === 'no'
-          //displayMessage(message, isError)
-
           if (isError) {
             return
           }
@@ -164,10 +159,9 @@ function addVideo(){
 }
 
 function updateTime(event){
-
-            var showTime=document.getElementById("showTime");
-            showTime.innerHTML=event.currentTime;
-          };
+      var showTime=document.getElementById("showTime");
+      showTime.innerHTML=event.currentTime;
+};
 
 /*Delete selected Text line */
 function deleteText(){
@@ -216,7 +210,7 @@ function editEndTime(){
 /*Edit comment*/
 function editComment(){
   var thisLi=document.getElementsByClassName("li-selected");
-  var thisText=thisLi[0].children[6];
+  var thisText=thisLi[0].children[3];
   thisText.setAttribute("contenteditable","true");
   placeCaretAtEnd( thisText );
 }
@@ -234,23 +228,6 @@ function addLine(){
    
 }
 
-/*save the text and time into VTT file and add to the video */
-function preview(){
-
-  fs.writeFile("test.vtt", extraText(), function(err) {
-    if(err) {
-        return console.log(err);
-    }
-    console.log("The file was saved!");
-  }); 
-  var videoParent=document.getElementById("video");
-  var newTrack=document.createElement("track");
-  newTrack.src="test.vtt";
-  newTrack.kind="captions";
-  newTrack.srclang="en";
-  newTrack.lable="English";
-  videoParent.appendChild(newTrack);
-}
 
 function myFunction() {
     document.getElementById("myDropdown").classList.toggle("show");
@@ -275,7 +252,7 @@ window.onclick = function(event) {
   // Unselecte the line if the user clicks outside of all line elements
   if(!event.target.matches(".oneline")&&
     !event.target.matches("#edit")&&
-    !event.target.matches("#de lete")&&
+    !event.target.matches("#delete")&&
     !event.target.matches("#addText")&&
     !event.target.matches(".selectee")){
 
@@ -284,13 +261,15 @@ window.onclick = function(event) {
  
  if(event.target.matches(".startTimeNode")
   ||event.target.matches(".endTimeNode")
-  ||event.target.matches(".textNode")){
+  ||event.target.matches(".textNode")
+  ||event.target.matches(".commentNode")){
     if($(".li-selected")){
       $(".li-selected").removeClass("li-selected");
     }
      var parentNode=event.target.parentNode;
      parentNode.className+=" li-selected";
  }
+
 }
 
 function saveFile(){
@@ -310,27 +289,13 @@ function saveFile(){
 
 function editStyle(){
    $("#setting").removeClass("settingDisabled");
+   //var parentNode=$("#contentDiv");
+   var LiLines=$(".oneline");
+   var thisLi=$(".oneline.li-selected");
+   var index=LiLines.index(thisLi);
+   initialize_test(index);
 }
 
-function saveEditing(){
-   var thisLi=document.getElementsByClassName("li-selected");
-
-   var eColor = document.getElementById("color");
-   var selectedColor= eColor.options[eColor.selectedIndex].text;
-   var eFont = document.getElementById("font");
-   var selectedFont= eFont.options[eFont.selectedIndex].text;
-   var eSize = document.getElementById("size");
-   var selectedSize= eSize.options[eSize.selectedIndex].text;
-   var ePosition = document.getElementById("position");
-   var selectedPosition= ePosition.options[ePosition.selectedIndex].text;
-
-   thisLi[0].children[5].innerText="<c."+
-                              selectedColor+"."
-                              +selectedFont+".size"+
-                              +selectedSize+
-                              ">";
-   $("#setting").addClass("settingDisabled");
-}
 
 /*Utilitied functions */
 
@@ -394,25 +359,30 @@ function timeProcess(time){
     return time;
 }
 
-/*create a new line Element*/
+
 
 /*extra content in container and make it vtt file format*/
 function extraText(){
   var parentNode=document.getElementById("contentDiv");
+  var track = video.textTracks[1];
   var nodeList=parentNode.childNodes;
   var i=0;
 
   var startString="WEBVTT FILE"+"\n \n";
-  for(;i<nodeList.length;i++){
-    var startTime=nodeList[i].children[0].innerText;
-    var endTime=nodeList[i].children[2].innerText;
-    var text=nodeList[i].children[4].innerText;
-    var style=nodeList[i].children[5].innerText;
-    var comment=nodeList[i].children[6].innerText;
-    if(style){
-      text=style+text+"</c>"
-    }
-    var string="\nNOTE "+comment+"\n\n"+startTime+"-->"+endTime+"\n"+text+"\n";
+  for(;i<track.cues.length;i++){
+    
+    var startTime=track.cues[i].startTime;
+    var endTime=track.cues[i].endTime;
+    var text=track.cues[i].text;
+    var line=track.cues[i].line;
+    var position=track.cues[i].position;
+    var comment=nodeList[i].children[3].innerText;
+    // if(style){
+    //   text=style+text+"</c>"
+    // }
+    var string="\nNOTE "+comment+"\n\n"
+                +startTime+"-->"+endTime+" line:"+line+" position:"+position+"\n"
+                +text+"\n";
     startString=startString+string;
   }
   return startString;

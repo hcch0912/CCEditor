@@ -58,32 +58,31 @@ video{
 	width: 450px;
 }
 ::cue(.red){
-	color:red;
+	color:red
 }
 ::cue(.blue) {
-     color:blue;
+     color:blue
 }
 ::cue(.yellow){
-	color:yellow;
+	color:yellow
 }
 ::cue(.white){
-	color:white;
+	color:white
 }
 ::cue(.italic){
 	font-style: italic
 }
 ::cue(.bold){
-	font-style: bold;
+	font-weight: bold
 }
 ::(.size12){
-	font-size: 12px;
+	font-size: 2em
 }
 ::(.size15){
-	font-size: 15px;
+	font-size: 3em
 }
-
 ::(.size18){
-	font-size: 18px;
+	font-size: 4em
 }
 
 
@@ -186,7 +185,7 @@ Left container
 }
 /* row2  */
 #row2{
-	height:50px;
+	height:100px;
 }
 #setting,#timeLine{
 	margin-top: 10px;
@@ -305,3 +304,29 @@ nav h1 {
 
   		width: 20px;
   }
+
+/*setting styles*/
+  .range-selectee{
+  	width:200px;
+  	height: 20px;
+  	display: inline-block;
+  }
+  #red, #green, #blue {
+    float: left;
+    clear: left;
+    width: 300px;
+    margin: 15px;
+  }
+  #swatch {
+    width: 120px;
+    height: 100px;
+    margin-top: 18px;
+    margin-left: 350px;
+    background-image: none;
+  }
+  #red .ui-slider-range { background: #ef2929; }
+  #red .ui-slider-handle { border-color: #ef2929; }
+  #green .ui-slider-range { background: #8ae234; }
+  #green .ui-slider-handle { border-color: #8ae234; }
+  #blue .ui-slider-range { background: #729fcf; }
+  #blue .ui-slider-handle { border-color: #729fcf; }

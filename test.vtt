@@ -1,27 +1,22 @@
 WEBVTT FILE
  
 
-NOTE 
+NOTE this is comment1
 
-00:00:00.000-->00:00:00.000
-<c.red.italic.size12>hello.</c>
+00:00:02.001-->00:00:02.522
+hello;
 
-NOTE 
+NOTE this is comment2
 
-00:00:00.000-->00:00:00.000
-<c.blue.italic.size18>hello;</c>
-
-NOTE 
-
-00:00:00.000-->00:00:00.000
+00:00:03.415-->00:00:04.388
 hello,
 
-NOTE 
+NOTE This is said by Tom
 
-00:00:00.000-->00:00:00.000
-hello?
+00:00:05.011-->00:00:05.374
+I
 
-NOTE 
+NOTE This is said by Tom
 
-00:00:00.000-->00:00:00.000
-hello!hello..
+00:00:06.383-->00:00:08.609
+am
