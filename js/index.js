@@ -44,7 +44,10 @@ function textProcess(file){
   var splited=file.replace(/(\.+|\:|\!|\?|\!|\;|\,)(\"*|\'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|"); 
   var i=0;
   for(;i<splited.length;i++){
-        parentNode.appendChild(createTextElement("00:00:00.000","00:00:00.000",splited[i],""));
+        parentNode.appendChild(createTextElement("00:00:00.00"+i,"00:00:00.00"+i,splited[i],""));
+        var cue=new VTTCue(0,0,splited[i]);
+        cue.id=i;
+        track.addCue(cue);
   }
   initialize_test();
 }
@@ -76,7 +79,9 @@ function textProcessVTT(file){
               text=splited[i].substring(a+16);
               parentNode.appendChild(createTextElement(startTime,endTime,text,commentTemp));
               //add cue element to DOM
-              //track.addCue(new VTTCue(reverseTime(startTime),reverseTime(endTime),text));
+              var cue=new VTTCue(reverseTime(startTime),reverseTime(endTime),text);
+              cue.id=i;
+              track.addCue(cue);
               initialize_test();
           }
         }
@@ -142,9 +147,6 @@ function createTextElement(startTime,endTime,text,comment){
                      console.log("end"+cue.endTime);
                }else{
                     video.currentTime=reverseTime(endTimeNode.innerText);
-                    //console.log("start"+cue.endTime);
-                    //var cue=getCurrentCue();
-                    //cue.endTime=video.currentTime;
                }
         };
         startTimeNode.innerHTML=startTime;
@@ -154,7 +156,6 @@ function createTextElement(startTime,endTime,text,comment){
         liLiNode.appendChild(endTimeNode);
         liLiNode.appendChild(textNode);
         liLiNode.appendChild(commentNode);
-        track.addCue(new VTTCue(reverseTime(startTime),reverseTime(endTime),text));
         return liLiNode;
         
 }

@@ -52,10 +52,8 @@ function getCurrentCue(){
       var LiLines=$(".oneline");
       var thisLi=$(".oneline.li-selected");
       var index=LiLines.index(thisLi);
-      console.log(index);
       var track = video.textTracks[1];
-      var cue = track.cues[index];
-      console.log(cue);
+      var cue = track.cues.getCueById(index);
       return cue;
 }
  
