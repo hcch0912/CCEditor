@@ -2,8 +2,12 @@
 var fs = require('fs');
 const {dialog} = require('electron').remote;
 
-/*upload Txt into container panel*/
+ var  video=document.getElementById("video");
+        track = video.addTextTrack("captions", "English", "en");
+        track.mode="showing";
 
+
+/*upload Txt into container panel*/
 function uploadText(){
 
    $('#uploadFile').trigger('click');
@@ -13,22 +17,20 @@ function uploadText(){
          var all   = $.when(file);
          all.done(function(){
       
-         if (file) {
-
-          var reader = new FileReader();
-          reader.readAsText(file);
-          if(file.name.match("vtt")){
-            reader.onload = function(e) {
-              textProcessVTT(e.target.result);
+           if (file) {
+              var reader = new FileReader();
+              reader.readAsText(file);
+              if(file.name.match("vtt")){
+                  reader.onload = function(e) {
+                    textProcessVTT(e.target.result);
+                  }
+              }else if(file.name.match("txt")){
+                  reader.onload = function(e) {
+                    textProcess(e.target.result);
+                  }
+              };
            }
-                
-           }else if(file.name.match("txt")){
-            reader.onload = function(e) {
-              textProcess(e.target.result);
-           }
-          };
-        }
-    });
+        });
   });
 }
 
@@ -44,8 +46,10 @@ function textProcess(file){
   for(;i<splited.length;i++){
         parentNode.appendChild(createTextElement("00:00:00.000","00:00:00.000",splited[i],""));
   }
+  initialize_test();
 }
 
+ /*process vTT file*/
 function textProcessVTT(file){
   var parentNode=document.getElementById("contentDiv");
   if(parentNode.hasChildNodes()){
@@ -54,9 +58,6 @@ function textProcessVTT(file){
   var splited=file.split("\n\n");
   var i=0;
   var commentTemp;
-  var  video=document.getElementById("video");
-        track = video.addTextTrack("captions", "English", "en");
-        track.mode="showing";
 
   for(;i<splited.length;i++){
     if(!splited[i].match("WEBVTT")&&!splited[i].match("STYLE")){
@@ -68,13 +69,15 @@ function textProcessVTT(file){
             commentTemp=splited[i].substring(splited[i].indexOf("NOTE")+4);
         }else{
           if(!splited[i].match("line")&&!splited[i].match("position")){
+            //TODO attributes
               var a=splited[i].indexOf("-->");
               startTime=splited[i].substring(0,a);
               endTime=splited[i].substring(a+3,a+15);
               text=splited[i].substring(a+16);
               parentNode.appendChild(createTextElement(startTime,endTime,text,commentTemp));
-         //add cue element to DOM
-              track.addCue(new VTTCue(reverseTime(startTime),reverseTime(endTime),text));
+              //add cue element to DOM
+              //track.addCue(new VTTCue(reverseTime(startTime),reverseTime(endTime),text));
+              initialize_test();
           }
         }
        
@@ -91,7 +94,9 @@ function reverseTime(time){
     return time;
 }
 
+
 function createTextElement(startTime,endTime,text,comment){
+
         var liLiNode=document.createElement("div");
         var startTimeNode=document.createElement("p");
         var endTimeNode=document.createElement("p");
@@ -105,19 +110,41 @@ function createTextElement(startTime,endTime,text,comment){
         endTimeNode.className="endTimeNode";
         commentNode.className="commentNode"
         startTimeNode.onclick=function(){
+               if($(".li-selected")){
+                  $(".li-selected").removeClass("li-selected");
+                }
+                 var parentNode=this.parentNode;
+                 parentNode.className+=" li-selected";
+                  //console.log(this.innerText);
               if(video.paused==false){
-                    var startTime= timeProcess(video.currentTime);
-                    this.innerText=startTime;
+                    this.innerText= timeProcess(video.currentTime);
+                    var cue=getCurrentCue();
+                    //console.log(cue.text);
+                    cue.startTime=video.currentTime;
+                    //console.log("start"+cue.startTime);
               }else{
                     video.currentTime=reverseTime(startTimeNode.innerText);
+
               }
         };
         endTimeNode.onclick=function(){
+                if($(".li-selected")){
+                  $(".li-selected").removeClass("li-selected");
+                }
+                 var parentNode=this.parentNode;
+                 parentNode.className+=" li-selected";
+                 console.log(this.innerText);
                if(video.paused==false){
-                    var endTime= timeProcess(video.currentTime);
-                    this.innerText=endTime;
+                    this.innerText=timeProcess(video.currentTime);
+                    var cue=getCurrentCue();
+                    console.log(cue.text);
+                    cue.endTime=video.currentTime;
+                     console.log("end"+cue.endTime);
                }else{
                     video.currentTime=reverseTime(endTimeNode.innerText);
+                    //console.log("start"+cue.endTime);
+                    //var cue=getCurrentCue();
+                    //cue.endTime=video.currentTime;
                }
         };
         startTimeNode.innerHTML=startTime;
@@ -127,7 +154,7 @@ function createTextElement(startTime,endTime,text,comment){
         liLiNode.appendChild(endTimeNode);
         liLiNode.appendChild(textNode);
         liLiNode.appendChild(commentNode);
-        
+        track.addCue(new VTTCue(reverseTime(startTime),reverseTime(endTime),text));
         return liLiNode;
         
 }
@@ -135,7 +162,7 @@ function createTextElement(startTime,endTime,text,comment){
 var URL = window.URL || window.webkitURL
 var displayMessage = function (message, isError) {
     alert("Can't play this file");
-}
+} 
 
 function addVideo(){
   
@@ -177,9 +204,22 @@ function editText(){
   var thisText=thisLi[0].children[2];
   thisText.setAttribute("contenteditable","true");
   placeCaretAtEnd( thisText );
+  //initialize_test();
   thisText.onkeypress=function(){
           if(this.onkeypress.arguments[0].charCode == 13){
             this.setAttribute("contenteditable","false");
+            var LiLines=$(".oneline");
+            var thisLi=$(".oneline.li-selected");
+            var index=LiLines.index(thisLi);
+            var track = video.textTracks[1];
+            var cue = track.cues[index];
+            var prefix;
+            var postfix="</c>";
+             if(cue.text.match("c.")){
+               prefix=cue.text.substring(0,cue.text.indexOf(">")+1);
+              }
+            cue.text=prefix+thisText.innerText+postfix;
+            initialize_test(cue);
           } 
         }
 }
@@ -189,6 +229,7 @@ function editStartTime(){
   var thisText=thisLi[0].children[0];
   thisText.setAttribute("contenteditable","true");
   placeCaretAtEnd( thisText );
+  initialize_test();
   thisText.onkeypress=function(){
           if(this.onkeypress.arguments[0].charCode == 13){
             this.setAttribute("contenteditable","false");
@@ -201,6 +242,7 @@ function editEndTime(){
   var thisText=thisLi[0].children[1];
   thisText.setAttribute("contenteditable","true");
   placeCaretAtEnd( thisText );
+  initialize_test();
   thisText.onkeypress=function(){
           if(this.onkeypress.arguments[0].charCode == 13){
             this.setAttribute("contenteditable","false");
@@ -213,6 +255,7 @@ function editComment(){
   var thisText=thisLi[0].children[3];
   thisText.setAttribute("contenteditable","true");
   placeCaretAtEnd( thisText );
+  initialize_test();
 }
 
 /*Add a new line to the container*/
@@ -234,9 +277,26 @@ function myFunction() {
 }
 
 
+
+function saveFile(){
+
+   dialog.showSaveDialog(function (fileName) {
+    if (fileName === undefined) return;
+    fs.writeFile(fileName,extraText(), function (err) { 
+        if (err === undefined) {
+           dialog.showMessageBox({ message: "The file has been saved! :-)",
+            buttons: ["OK"] });
+         } else {
+           dialog.showErrorBox("File Save Error", err.message);
+         }  
+    });
+  });
+}
+
+   
 window.onclick = function(event) {
 
-  console.log(event.target);
+ 
   // Close the dropdown if the user clicks outside of it
   if (!event.target.matches('#edit')) {
 
@@ -268,36 +328,11 @@ window.onclick = function(event) {
     }
      var parentNode=event.target.parentNode;
      parentNode.className+=" li-selected";
+
  }
 
 }
 
-function saveFile(){
-
-   dialog.showSaveDialog(function (fileName) {
-    if (fileName === undefined) return;
-    fs.writeFile(fileName,extraText(), function (err) { 
-        if (err === undefined) {
-           dialog.showMessageBox({ message: "The file has been saved! :-)",
-            buttons: ["OK"] });
-         } else {
-           dialog.showErrorBox("File Save Error", err.message);
-         }  
-    });
-  });
-}
-
-function editStyle(){
-   $("#setting").removeClass("settingDisabled");
-   //var parentNode=$("#contentDiv");
-   var LiLines=$(".oneline");
-   var thisLi=$(".oneline.li-selected");
-   var index=LiLines.index(thisLi);
-   initialize_test(index);
-}
-
-
-/*Utilitied functions */
 
 
 /*transform the time in seconds into the format that VTT file needs*/
@@ -370,7 +405,7 @@ function extraText(){
 
   var startString="WEBVTT FILE"+"\n \n";
   for(;i<track.cues.length;i++){
-    
+
     var startTime=track.cues[i].startTime;
     var endTime=track.cues[i].endTime;
     var text=track.cues[i].text;
@@ -411,5 +446,4 @@ $('#contentDiv').nuSelectable({
   selectionClass: 'nu-selection-box',
   selectedClass: 'li-selected',
   autoRefresh: true
-
 });

@@ -55,7 +55,7 @@
 						    <a onclick="editText()" class="selectee">text</a>
 						    <a onclick="editStartTime()" class="selectee">start</a>
 						    <a onclick="editEndTime()" class="selectee">end</a>
-						    <a onclick="editStyle()" class="selectee">Style</a>
+						    <!-- <a onclick="editStyle()" class="selectee">Style</a> -->
 						    <a onclick="editComment()" class="seletee">Comment</a>
 						  </div>
 					
@@ -79,16 +79,14 @@
 
 	</div>
 	
-	<div id="setting" class="right-container settingDisabled" >
+	<div id="setting" class="right-container" >
 	
 		<form id="setting-form" >
+			<div>
 			<a>Color</a>
-			<select id="color" class="selectee">
-			  <option value="red">red</option>
-			  <option value="black">blue</option>
-			  <option value="white">white</option>
-			  <option value="yellow">yellow</option>
-			</select>
+				<div id="color-input" class="selectee range-selectee" ></div>
+				<output for="color-input" id="color-output"></output>
+			</div>
 			<a>Font</a>
 			<select id="font" class="selectee">
 			  <option value="Arial">italic</option>

@@ -1,41 +1,6 @@
 var video = document.querySelector('video');
-var track_elem = document.querySelector('track');
 
-track_elem.addEventListener('loaded',initialize_test,false); // Bug in FF31 MAC: wrong event name
-track_elem.addEventListener('load',initialize_test,false);
-
-function create_sample_cue(cue){
-    var vtt_cue;
-   
-    timestamps=cue.startTime+" --> "+cue.endTime;
-    var settings = " line:" + cue.line;
-    settings += " position:" + cue.position + "%";
-    //settings += " align:" + cue.align;
-    //settings += " size:" + cue.size + "%";
-    // if (cue.vertical != "") {
-    //   settings += " vertical:" + cue.vertical;
-    // }
-    var timing = timestamps + settings;
-    //var styleClass="<c."+
-    vtt_cue = timing + "\n" + cue.text;
-    //$('#sample_cue').html(vtt_cue);
-  }
-
-function initialize_test(cue_num){
-  var track = video.textTracks[1];
-  var cue = track.cues[cue_num];
-  
-  // Set some of these values initially
-  cue.line = 13;
-  cue.position = 50;
-  cue.align = 'middle';
-  cue.size = 100;
-  cue.vertical = '';
-
-  $('div#contentDiv p#textNode').on('keyup', function(e){
-    cue.text = $(this).val();
-    create_sample_cue(cue);
-  });
+function initialize_test(){
 
   $( "#line-position-input" ).slider({
       range: "min",
@@ -45,9 +10,8 @@ function initialize_test(cue_num){
       slide: function( event, ui ) {
         $( "#line-position-output" ).val( ui.value );
           var line = ui.value;
+          var cue=getCurrentCue();         
           cue.line = parseInt(line);
-          //$('#line-position-output')[0].innerText = line;
-          create_sample_cue(cue);  
       }
     });
   $( "#line-position-output" ).val( $( "#line-position-input" ).slider( "value" ) );
@@ -59,38 +23,40 @@ function initialize_test(cue_num){
       slide: function( event, ui ) {
         $( "#cue-position-output" ).val( ui.value );
             var position = ui.value;
+            var cue=getCurrentCue();
             cue.position = parseInt(position);
-            //$('#cue-position-output')[0].innerText = position;
-            create_sample_cue(cue);
       }
     });
   $( "#cue-position-output" ).val( $( "#cue-position-input" ).slider( "value" ) );
 
-  // $('form#caption-change-form .align-radio input').on('change input', function(e){
-  //   cue.align = $(this).val();
-  //   create_sample_cue(cue);
-  // });
-  // $('form#caption-change-form input#input-change-size').on('change input', function(e){
-  //   var size = $(this).val();
-  //   cue.size = parseInt(size);
-  //   $('#size-setting')[0].value = size;
-  //   create_sample_cue(cue);
-  // });
-  // $('form#caption-change-form .vertical-radio input').on('change input', function(e){
-  //   cue.vertical = $(this).val();
-  //   create_sample_cue(cue);
-  // });
-  // $('form#style-change-form textarea').on('keyup', function(){
-  //   $('#extra-textarea-styles').html('::cue{' + $(this).val() + '}');
-  //   create_sample_cue(cue);
-  // });
-
-  create_sample_cue(cue);
+   var colorArr=["white","red","yellow","green","blue","pink","purple","cyan","orange","lime"];
+  $( "#color-input" ).slider({
+      range: "min",
+      value: 5,
+      min: 0,
+      max: 10,
+      slide: function( event, ui ) {
+              $( "#color-output" ).val( colorArr[ui.value] );
+              var cue=getCurrentCue();
+              if(cue.text.match("c.")){
+                cue.text=cue.text.substring(cue.text.indexOf(">")+1,cue.text.indexOf("</c>"));
+              }
+              cue.text ="<c."+colorArr[ui.value]+">"+cue.text+"</c>"
+             
+      }
+    });
 }
 
-// video.pause();
-// setTimeout(function(){
-//   video.play();
-//   // initialize_test();
-// }, 2000);
+function getCurrentCue(){
+
+      var LiLines=$(".oneline");
+      var thisLi=$(".oneline.li-selected");
+      var index=LiLines.index(thisLi);
+      console.log(index);
+      var track = video.textTracks[1];
+      var cue = track.cues[index];
+      console.log(cue);
+      return cue;
+}
+ 
 

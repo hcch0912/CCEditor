@@ -57,32 +57,41 @@ video{
 	height:285px;
 	width: 450px;
 }
+::cue(.white){
+	color:white
+}
 ::cue(.red){
 	color:red
-}
-::cue(.blue) {
-     color:blue
 }
 ::cue(.yellow){
 	color:yellow
 }
-::cue(.white){
-	color:white
+::cue(.green){
+	color: green;
+}
+::cue(.blue) {
+     color:blue
+}
+::cue(.pink){
+	color:pink;
+}
+::cue(.purple){
+	color:purple;
+}
+::cue(.cyan){
+	color: cyan;
+}
+::cue(.orange){
+	color: orange;
+}
+::cue(.lime){
+	color: lime;
 }
 ::cue(.italic){
 	font-style: italic
 }
 ::cue(.bold){
 	font-weight: bold
-}
-::(.size12){
-	font-size: 2em
-}
-::(.size15){
-	font-size: 3em
-}
-::(.size18){
-	font-size: 4em
 }
 
 
