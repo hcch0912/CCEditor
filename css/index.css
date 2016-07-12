@@ -53,46 +53,6 @@ html, body {
 
 }
 
-video{
-	height:285px;
-	width: 450px;
-}
-::cue(.white){
-	color:white
-}
-::cue(.red){
-	color:red
-}
-::cue(.yellow){
-	color:yellow
-}
-::cue(.green){
-	color: green;
-}
-::cue(.blue) {
-     color:blue
-}
-::cue(.pink){
-	color:pink;
-}
-::cue(.purple){
-	color:purple;
-}
-::cue(.cyan){
-	color: cyan;
-}
-::cue(.orange){
-	color: orange;
-}
-::cue(.lime){
-	color: lime;
-}
-::cue(.italic){
-	font-style: italic
-}
-::cue(.bold){
-	font-weight: bold
-}
 
 
 /**
@@ -194,11 +154,11 @@ Left container
 }
 /* row2  */
 #row2{
-	height:100px;
+	height:200px;
 }
 #setting,#timeLine{
 	margin-top: 10px;
-	height:70px;
+	height:150px;
 }
 #timeLine{
 	background-color: #e6e6e6;

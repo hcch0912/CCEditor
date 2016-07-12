@@ -1,0 +1,71 @@
+video{
+	height:285px;
+	width: 450px;
+}
+::cue(.txt-white){
+	color:white
+}
+::cue(.txt-red){
+	color:red
+}
+::cue(.txt-yellow){
+	color:yellow
+}
+::cue(.txt-green){
+	color: green;
+}
+::cue(.txt-blue) {
+     color:blue
+}
+::cue(.txt-pink){
+	color:pink;
+}
+::cue(.txt-purple){
+	color:purple;
+}
+::cue(.txt-cyan){
+	color: cyan;
+}
+::cue(.txt-orange){
+	color: orange;
+}
+::cue(.txt-lime){
+	color: lime;
+}
+::cue(.bg-white){
+	background-color:white
+}
+::cue(.bg-red){
+	background-color:red
+}
+::cue(.bg-yellow){
+	background-color:yellow
+}
+::cue(.bg-green){
+	background-color: green;
+}
+::cue(.bg-blue) {
+     background-color:blue
+}
+::cue(.bg-pink){
+	background-color:pink;
+}
+::cue(.bg-purple){
+	background-color:purple;
+}
+::cue(.bg-cyan){
+	background-color: cyan;
+}
+::cue(.bg-orange){
+	background-color: orange;
+}
+::cue(.bg-lime){
+	background-color: lime;
+}
+::cue(.italic){
+	font-style: italic
+}
+::cue(.bold){
+	font-weight: bold
+}
+

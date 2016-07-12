@@ -37,14 +37,12 @@ function uploadText(){
 /* preprocess the text file to split the text by sentences*/
 
 function textProcess(file){
-  var parentNode=document.getElementById("contentDiv");
-  if(parentNode.hasChildNodes()){
-      parentNode.innerHTML="";
-    }
+  clearCue();
+  clearNode();
   var splited=file.replace(/(\.+|\:|\!|\?|\!|\;|\,)(\"*|\'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|"); 
   var i=0;
   for(;i<splited.length;i++){
-        parentNode.appendChild(createTextElement("00:00:00.00"+i,"00:00:00.00"+i,splited[i],""));
+        parentNode.appendChild(createTextElement("00:00:00.000","00:00:00.000",splited[i],""));
         var cue=new VTTCue(0,0,splited[i]);
         cue.id=i;
         track.addCue(cue);
@@ -52,43 +50,20 @@ function textProcess(file){
   initialize_test();
 }
 
- /*process vTT file*/
-function textProcessVTT(file){
+function clearCue(){
+     var track = video.textTracks[0];
+     var length=track.cues.length;
+     var i=0;
+     for(;i<length;i++){
+        track.removeCue(track.cues[0]);
+     }
+     
+}
+function clearNode(){
   var parentNode=document.getElementById("contentDiv");
   if(parentNode.hasChildNodes()){
       parentNode.innerHTML="";
   }
-  var splited=file.split("\n\n");
-  var i=0;
-  var commentTemp;
-
-  for(;i<splited.length;i++){
-    if(!splited[i].match("WEBVTT")&&!splited[i].match("STYLE")){
-        var comment;
-        var startTime;
-        var endTime;
-        var text;
-        if(splited[i].match("NOTE")){
-            commentTemp=splited[i].substring(splited[i].indexOf("NOTE")+4);
-        }else{
-          if(!splited[i].match("line")&&!splited[i].match("position")){
-            //TODO attributes
-              var a=splited[i].indexOf("-->");
-              startTime=splited[i].substring(0,a);
-              endTime=splited[i].substring(a+3,a+15);
-              text=splited[i].substring(a+16);
-              parentNode.appendChild(createTextElement(startTime,endTime,text,commentTemp));
-              //add cue element to DOM
-              var cue=new VTTCue(reverseTime(startTime),reverseTime(endTime),text);
-              cue.id=i;
-              track.addCue(cue);
-              initialize_test();
-          }
-        }
-       
-     }
-  }
-  
 }
 /* transform formatted time to seconds*/
 function reverseTime(time){
@@ -212,7 +187,7 @@ function editText(){
             var LiLines=$(".oneline");
             var thisLi=$(".oneline.li-selected");
             var index=LiLines.index(thisLi);
-            var track = video.textTracks[1];
+            var track = video.textTracks[0];
             var cue = track.cues[index];
             var prefix;
             var postfix="</c>";
@@ -400,22 +375,19 @@ function timeProcess(time){
 /*extra content in container and make it vtt file format*/
 function extraText(){
   var parentNode=document.getElementById("contentDiv");
-  var track = video.textTracks[1];
+  var track = video.textTracks[0];
   var nodeList=parentNode.childNodes;
   var i=0;
 
   var startString="WEBVTT FILE"+"\n \n";
   for(;i<track.cues.length;i++){
 
-    var startTime=track.cues[i].startTime;
-    var endTime=track.cues[i].endTime;
+    var startTime=timeProcess(track.cues[i].startTime);
+    var endTime=timeProcess(track.cues[i].endTime);
     var text=track.cues[i].text;
     var line=track.cues[i].line;
     var position=track.cues[i].position;
     var comment=nodeList[i].children[3].innerText;
-    // if(style){
-    //   text=style+text+"</c>"
-    // }
     var string="\nNOTE "+comment+"\n\n"
                 +startTime+"-->"+endTime+" line:"+line+" position:"+position+"\n"
                 +text+"\n";

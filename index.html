@@ -5,6 +5,7 @@
   <meta charset="utf-8">
 
   <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/cue.css">
   <link rel="stylesheet" href="css/jquery-ui.css">
   	<!-- Insert this line above script imports  -->
   <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
@@ -31,7 +32,6 @@
 			<a id="addVideo" onclick="addVideo()">Open Video</a> 
 		</div>
 		<video id="video" controls ontimeupdate="updateTime(this)"" >
-			<track id="track" kind="captions"  lable="Eng" mode="showing">
 		</video> 
 	</div>
 	
@@ -39,9 +39,6 @@
 		<div class="banner">
 			<input id="uploadFile" type="file"  accept="text/vtt" hidden>
 			<a id="addText" onclick="uploadText()" >Upload Text</a>
-			<img src="img/preview.png" align="right" onclick="preview()"
-			alt="alternative text" title="this will be displayed as a tooltip"
-			>
 
 		</div>
 		<div id="contentDiv" class="scroll">
@@ -55,7 +52,6 @@
 						    <a onclick="editText()" class="selectee">text</a>
 						    <a onclick="editStartTime()" class="selectee">start</a>
 						    <a onclick="editEndTime()" class="selectee">end</a>
-						    <!-- <a onclick="editStyle()" class="selectee">Style</a> -->
 						    <a onclick="editComment()" class="seletee">Comment</a>
 						  </div>
 					
@@ -87,6 +83,11 @@
 				<div id="color-input" class="selectee range-selectee" ></div>
 				<output for="color-input" id="color-output"></output>
 			</div>
+			<div>
+			<a>Background Color</a>
+				<div id="bg-color-input" class="selectee range-selectee" ></div>
+				<output for="bg-color-input" id="bg-color-output"></output>
+			</div>
 			<a>Font</a>
 			<select id="font" class="selectee">
 			  <option value="Arial">italic</option>
@@ -115,6 +116,7 @@
     <script src="js/jquery.nu-selectable.js"></script>
     <script src="js/jquery-ui.js"></script>>
   	<script src="js/cue-setting.js"></script>
+  	<script src="js/processVTT.js"></script>>
     <script src="js/index.js"></script>
     <script>if (window.module) module = window.module;</script>
     
