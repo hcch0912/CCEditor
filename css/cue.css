@@ -1,6 +1,6 @@
 video{
-	height:285px;
-	width: 450px;
+	height:100%;
+	width: 100%;
 }
 ::cue(.txt-white){
 	color:white

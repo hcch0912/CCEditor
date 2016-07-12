@@ -662,7 +662,7 @@ button.ui-button::-moz-focus-inner {
 	position: absolute;
 	z-index: 2;
 	width: 1.2em;
-	height: 1.2em;
+	height: 0.8em;
 	cursor: default;
 	-ms-touch-action: none;
 	touch-action: none;
@@ -683,7 +683,7 @@ button.ui-button::-moz-focus-inner {
 }
 
 .ui-slider-horizontal {
-	height: .8em;
+	height: .5em;
 }
 .ui-slider-horizontal .ui-slider-handle {
 	top: -.3em;
@@ -845,7 +845,7 @@ body .ui-tooltip {
 }
 .ui-widget-content {
 	border: 1px solid #dddddd;
-	background: #ffffff;
+	background: #6aa7af;
 	color: #333333;
 }
 .ui-widget-content a {
@@ -902,8 +902,8 @@ body .ui-tooltip {
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
-	border: 1px solid #003eff;
-	background: #007fff;
+	border: 1px solid #ffffff;
+	background: #4EB1BA;
 	font-weight: normal;
 	color: #ffffff;
 }

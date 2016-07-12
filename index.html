@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="css/index.css">
   <link rel="stylesheet" href="css/cue.css">
   <link rel="stylesheet" href="css/jquery-ui.css">
+  <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
   	<!-- Insert this line above script imports  -->
   <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
@@ -14,103 +17,87 @@
 </head>
 
 <body>
-    
+    		<input id="uploadVideo" type="file"  accept="video/*" hidden>
+			<input id="uploadFile" type="file"  accept="text/vtt" hidden>
   <nav>
-    <ul class="nav-title">
-      <li><a >SubEditor</a></li>
+    <ul >
+      <li><a   class="nav-title">CC EDITOR</a></li>
+      <li class="nav-menu">
+      <p  onclick="addVideo()">Open Video</p>
+      <p  onclick="uploadText()">Open File</p>
+      </li>
     </ul>
   </nav>
-
-
-    </ul>
-  </div>
+<div class="splitor"></div>
 
 <div class="container">
 	<div class="left-container" id="video-container">
-		<div class="banner" id="banner-video">
-			<input id="uploadVideo" type="file"  accept="video/*" hidden>
-			<a id="addVideo" onclick="addVideo()">Open Video</a> 
-		</div>
 		<video id="video" controls ontimeupdate="updateTime(this)"" >
 		</video> 
 	</div>
 	
 	<div class="right-container">
-		<div class="banner">
-			<input id="uploadFile" type="file"  accept="text/vtt" hidden>
-			<a id="addText" onclick="uploadText()" >Upload Text</a>
-
+		<div class="Headerline">
+			<p >Start Time</p>
+			<p >End Time</p>
+			<p >Text</p>
+			<p >Note</p>
 		</div>
 		<div id="contentDiv" class="scroll">
 		
 		</div>
-	<div class="footer">
-					<img src="img/add.png" id="addText" onclick="addLine()">
-					<img src="img/delete.png" id="delete" align="right" onclick="deleteText()">
-					<img src="img/edit.png" id="edit" align="right" onclick="myFunction()">
-						  <div id="myDropdown" class="dropdown-content">
-						    <a onclick="editText()" class="selectee">text</a>
-						    <a onclick="editStartTime()" class="selectee">start</a>
-						    <a onclick="editEndTime()" class="selectee">end</a>
-						    <a onclick="editComment()" class="seletee">Comment</a>
-						  </div>
-					
-					
-			
+		<div class="footer">
+						<img src="img/add.png" id="addText" onclick="addLine()">
+						<img src="img/delete.png" id="delete" align="right" onclick="deleteText()">
+						<img src="img/edit.png" id="edit" align="right" onclick="myFunction()">
+							  <div id="myDropdown" class="dropdown-content">
+							    <a onclick="editText()" class="selectee">text</a>
+							    <a onclick="editStartTime()" class="selectee">start</a>
+							    <a onclick="editEndTime()" class="selectee">end</a>
+							    <a onclick="editComment()" class="seletee">Comment</a>
+							  </div>
+		</div>
 	</div>
-	</div>
-
+ 
 </div>
+<p id="saveEdit" onclick="saveEditing()" class="selectee ">Save</p>
 
 
-<div id="row2" class="container">
-
-	<div id="timeLine" class="left-container">
-		<p class="info" id="showTime">
-		</p>
-		<p class="info">
-			Keep clicking the text element during the period you want to add subtitle  in 
-		</p>
-
-
-	</div>
 	
-	<div id="setting" class="right-container" >
-	
+	<div id="setting" >
+	<div class="divider"></div>
 		<form id="setting-form" >
-			<div>
-			<a>Color</a>
+			<div class="setting-block">
+			<a  class="setting-lable">Text Color</a>
 				<div id="color-input" class="selectee range-selectee" ></div>
 				<output for="color-input" id="color-output"></output>
 			</div>
-			<div>
-			<a>Background Color</a>
+			<div class="setting-block">
+			<a class="setting-lable">BKG Color</a>
 				<div id="bg-color-input" class="selectee range-selectee" ></div>
 				<output for="bg-color-input" id="bg-color-output"></output>
 			</div>
-			<a>Font</a>
+			<!-- <a>Font</a>
 			<select id="font" class="selectee">
 			  <option value="Arial">italic</option>
 			  <option value="Bold">bold</option>
-			</select>
-			<div id="line-position" class="input-setting">
-			<a>Line position</a>
+			</select> -->
+			<div id="line-position" class="setting-block">
+			<a class="setting-lable">Line position</a>
 				<div id="line-position-input" class="selectee range-selectee" ></div>
 				<output for="line-position-input" id="line-position-output"></output>
 			</div>
 
-			<div id="cue-position" class="input-setting">
-			<a>Cue position</a>
+			<div id="cue-position" class="setting-block">
+			<a class="setting-lable">Cue position</a>
 				<div id="cue-position-input" class="selectee range-selectee" ></div>
 				<output for="cue-position-input" id="cue-position-output"></output>
 			</div>
 	    </form>
-		<!-- <img id="saveEdit" src="img/save.png" onclick="saveEditing()" class="selectee"> -->
-	</div>
-	
+		<div class="divider"></div>
 </div>
-<img id="download" src="img/download.png" onclick="saveFile()">
-
+<!-- <img id="download" src="img/download.png" onclick="saveFile()">
+ -->
 
     <script src="js/jquery.min.js"></script>
     <script src="js/jquery.nu-selectable.js"></script>
