@@ -32,15 +32,15 @@
 
 <div class="container">
 	<div class="left-container" id="video-container">
-		<video id="video" controls ontimeupdate="updateTime(this)"" >
+		<video id="video" controls >
 		</video> 
 	</div>
 	
 	<div class="right-container">
 		<div class="Headerline">
-			<p >Start Time</p>
-			<p >End Time</p>
-			<p >Text</p>
+			<p class="headTime">Start Time</p>
+			<p>End Time</p>
+			<p class="headText">Text</p>
 			<p >Note</p>
 		</div>
 		<div id="contentDiv" class="scroll">
@@ -60,7 +60,7 @@
 	</div>
  
 </div>
-<p id="saveEdit" onclick="saveEditing()" class="selectee ">Save</p>
+<p id="saveEdit" onclick="saveFile()" class="selectee ">Save</p>
 
 
 	
@@ -77,11 +77,6 @@
 				<div id="bg-color-input" class="selectee range-selectee" ></div>
 				<output for="bg-color-input" id="bg-color-output"></output>
 			</div>
-			<!-- <a>Font</a>
-			<select id="font" class="selectee">
-			  <option value="Arial">italic</option>
-			  <option value="Bold">bold</option>
-			</select> -->
 			<div id="line-position" class="setting-block">
 			<a class="setting-lable">Line position</a>
 				<div id="line-position-input" class="selectee range-selectee" ></div>
@@ -96,14 +91,11 @@
 	    </form>
 		<div class="divider"></div>
 </div>
-<!-- <img id="download" src="img/download.png" onclick="saveFile()">
- -->
-
     <script src="js/jquery.min.js"></script>
     <script src="js/jquery.nu-selectable.js"></script>
     <script src="js/jquery-ui.js"></script>>
   	<script src="js/cue-setting.js"></script>
-  	<script src="js/processVTT.js"></script>>
+  	<script src="js/FileProcess.js"></script>>
     <script src="js/index.js"></script>
     <script>if (window.module) module = window.module;</script>
     

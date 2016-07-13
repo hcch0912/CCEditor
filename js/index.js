@@ -3,276 +3,11 @@ var fs = require('fs');
 const {dialog} = require('electron').remote;
 
  var  video=document.getElementById("video");
-        track = video.addTextTrack("captions", "English", "en");
-        track.mode="showing";
+      track = video.addTextTrack("captions", "English", "en");
+      track.mode="showing";
 
-
-/*upload Txt into container panel*/
-function uploadText(){
-
-   $('#uploadFile').trigger('click');
-   $('#uploadFile').on('change',function(){
-         
-         var file = document.getElementById('uploadFile').files[0];
-         var all   = $.when(file);
-         all.done(function(){
-      
-           if (file) {
-              var reader = new FileReader();
-              reader.readAsText(file);
-              if(file.name.match("vtt")){
-                  reader.onload = function(e) {
-                    textProcessVTT(e.target.result);
-                  }
-              }else if(file.name.match("txt")){
-                  reader.onload = function(e) {
-                    textProcess(e.target.result);
-                  }
-              };
-           }
-        });
-  });
-}
-
-/* preprocess the text file to split the text by sentences*/
-
-function textProcess(file){
-  clearCue();
-  clearNode();
-  var splited=file.replace(/(\.+|\:|\!|\?|\!|\;|\,)(\"*|\'*|\)*|}*|]*)(\s|\n|\r|\r\n)/gm, "$1$2|").split("|"); 
-  var i=0;
-  for(;i<splited.length;i++){
-        parentNode.appendChild(createTextElement("00:00:00.000","00:00:00.000",splited[i],""));
-        var cue=new VTTCue(0,0,splited[i]);
-        cue.id=i;
-        track.addCue(cue);
-  }
-  initialize_test();
-}
-
-function clearCue(){
-     var track = video.textTracks[0];
-     var length=track.cues.length;
-     var i=0;
-     for(;i<length;i++){
-        track.removeCue(track.cues[0]);
-     }
-     
-}
-function clearNode(){
-  var parentNode=document.getElementById("contentDiv");
-  if(parentNode.hasChildNodes()){
-      parentNode.innerHTML="";
-  }
-}
-/* transform formatted time to seconds*/
-function reverseTime(time){
-    var timeArr=time.split(":");
-    var right=timeArr[2].split(".")[1];
-    var second=timeArr[2].split(".")[0];
-    time=timeArr[0]*3600+timeArr[1]*60+second+"."+right;
-    return time;
-}
-
-
-function createTextElement(startTime,endTime,text,comment){
-
-        var liLiNode=document.createElement("div");
-        var startTimeNode=document.createElement("p");
-        var endTimeNode=document.createElement("p");
-        var textNode=document.createElement("p");
-        var commentNode=document.createElement("p");
-
-        textNode.innerHTML=text;
-        textNode.className="textNode";
-        liLiNode.className="oneline";
-        startTimeNode.className="startTimeNode";
-        endTimeNode.className="endTimeNode";
-        commentNode.className="commentNode"
-        startTimeNode.onclick=function(){
-               if($(".li-selected")){
-                  $(".li-selected").removeClass("li-selected");
-                }
-                 var parentNode=this.parentNode;
-                 parentNode.className+=" li-selected";
-                  //console.log(this.innerText);
-              if(video.paused==false){
-                    this.innerText= timeProcess(video.currentTime);
-                    var cue=getCurrentCue();
-                    //console.log(cue.text);
-                    cue.startTime=video.currentTime;
-                    //console.log("start"+cue.startTime);
-              }else{
-                    video.currentTime=reverseTime(startTimeNode.innerText);
-
-              }
-        };
-        endTimeNode.onclick=function(){
-                if($(".li-selected")){
-                  $(".li-selected").removeClass("li-selected");
-                }
-                 var parentNode=this.parentNode;
-                 parentNode.className+=" li-selected";
-                 console.log(this.innerText);
-               if(video.paused==false){
-                    this.innerText=timeProcess(video.currentTime);
-                    var cue=getCurrentCue();
-                    console.log(cue.text);
-                    cue.endTime=video.currentTime;
-                     console.log("end"+cue.endTime);
-               }else{
-                    video.currentTime=reverseTime(endTimeNode.innerText);
-               }
-        };
-        startTimeNode.innerHTML=startTime;
-        endTimeNode.innerHTML=endTime;
-        commentNode.innerHTML=comment;
-        liLiNode.appendChild(startTimeNode);
-        liLiNode.appendChild(endTimeNode);
-        liLiNode.appendChild(textNode);
-        liLiNode.appendChild(commentNode);
-        return liLiNode;
-        
-}
-/*add video to the page and alter error if the file is not playable*/
-var URL = window.URL || window.webkitURL
-var displayMessage = function (message, isError) {
-    alert("Can't play this file");
-} 
-
-function addVideo(){
-  
-    $('#uploadVideo').trigger('click');
-    $('#uploadVideo').on('change',function(){
-     
-          var file = this.files[0]
-          var type = file.type
-          var videoNode = document.getElementById('video')
-          var canPlay = videoNode.canPlayType(type)
-          if (canPlay === '') canPlay = 'no'
-          var message = 'Can play type "' + type + '": ' + canPlay
-          var isError = canPlay === 'no'
-          if (isError) {
-            return
-          }
-          var fileURL = URL.createObjectURL(file)
-          videoNode.src = fileURL;
-  });   
-
-}
-
-function updateTime(event){
-      var showTime=document.getElementById("showTime");
-      showTime.innerHTML=event.currentTime;
-};
-
-/*Delete selected Text line */
-function deleteText(){
-  var thisText=document.getElementsByClassName("li-selected");
-  var parentNode=thisText[0].parentNode;
-  parentNode.removeChild(thisText[0]);
-  
-
-}
-/*Edit selected Text line */
-function editText(){
-  var thisLi=document.getElementsByClassName("li-selected");
-  var thisText=thisLi[0].children[2];
-  thisText.setAttribute("contenteditable","true");
-  placeCaretAtEnd( thisText );
-  //initialize_test();
-  thisText.onkeypress=function(){
-          if(this.onkeypress.arguments[0].charCode == 13){
-            this.setAttribute("contenteditable","false");
-            var LiLines=$(".oneline");
-            var thisLi=$(".oneline.li-selected");
-            var index=LiLines.index(thisLi);
-            var track = video.textTracks[0];
-            var cue = track.cues[index];
-            var prefix;
-            var postfix="</c>";
-             if(cue.text.match("c.")){
-               prefix=cue.text.substring(0,cue.text.indexOf(">")+1);
-              }
-            cue.text=prefix+thisText.innerText+postfix;
-            initialize_test(cue);
-          } 
-        }
-}
-/*Edit selected line start time */
-function editStartTime(){
-  var thisLi=document.getElementsByClassName("li-selected");
-  var thisText=thisLi[0].children[0];
-  thisText.setAttribute("contenteditable","true");
-  placeCaretAtEnd( thisText );
-  initialize_test();
-  thisText.onkeypress=function(){
-          if(this.onkeypress.arguments[0].charCode == 13){
-            this.setAttribute("contenteditable","false");
-          } 
-        }
-}
-/*Edit selected line end time */
-function editEndTime(){
-  var thisLi=document.getElementsByClassName("li-selected");
-  var thisText=thisLi[0].children[1];
-  thisText.setAttribute("contenteditable","true");
-  placeCaretAtEnd( thisText );
-  initialize_test();
-  thisText.onkeypress=function(){
-          if(this.onkeypress.arguments[0].charCode == 13){
-            this.setAttribute("contenteditable","false");
-          } 
-        }
-}
-/*Edit comment*/
-function editComment(){
-  var thisLi=document.getElementsByClassName("li-selected");
-  var thisText=thisLi[0].children[3];
-  thisText.setAttribute("contenteditable","true");
-  placeCaretAtEnd( thisText );
-  initialize_test();
-}
-
-/*Add a new line to the container*/
-function addLine(){
-
-   var parentNode=document.getElementById("contentDiv");
-   var thisLi=document.getElementsByClassName("li-selected");
-   if(thisLi.length!=0){
-    parentNode.insertBefore(createTextElement(" "), thisLi[0]);
-   }else{
-    parentNode.appendChild(createTextElement(" "));
-   }
-   
-}
-
-
-function myFunction() {
-    document.getElementById("myDropdown").classList.toggle("show");
-}
-
-
-
-function saveFile(){
-
-   dialog.showSaveDialog(function (fileName) {
-    if (fileName === undefined) return;
-    fs.writeFile(fileName,extraText(), function (err) { 
-        if (err === undefined) {
-           dialog.showMessageBox({ message: "The file has been saved! :-)",
-            buttons: ["OK"] });
-         } else {
-           dialog.showErrorBox("File Save Error", err.message);
-         }  
-    });
-  });
-}
-
-   
 window.onclick = function(event) {
-
- 
+  
   // Close the dropdown if the user clicks outside of it
   if (!event.target.matches('#edit')) {
 
@@ -304,13 +39,190 @@ window.onclick = function(event) {
     }
      var parentNode=event.target.parentNode;
      parentNode.className+=" li-selected";
-
+     updateSetting(getCurrentCue());
  }
 
+ if(event.target.matches(".startTimeNode")){
+    var cue=getCurrentCue();
+    if(cue){
+        if(video.paused==false){
+           event.target.innerText= timeProcess(video.currentTime);
+          cue.startTime=video.currentTime;
+        }else{
+           video.currentTime=reverseTime(event.target.innerText);
+        }
+    }
+ }
+ if(event.target.matches(".endTimeNode")){
+    var cue=getCurrentCue();
+    if(cue){
+        if(video.paused==false){
+           event.target.innerText= timeProcess(video.currentTime);
+          cue.endTime=video.currentTime;
+        }else{
+           video.currentTime=reverseTime(event.target.innerText);
+        }
+    }
+}
+
+}
+
+/*upload Txt into container panel*/
+function uploadText(){
+
+   $('#uploadFile').trigger('click');
+   $('#uploadFile').on('change',function(){
+         
+         var file = document.getElementById('uploadFile').files[0];
+         var all   = $.when(file);
+         all.done(function(){
+      
+           if (file) {
+              var reader = new FileReader();
+              reader.readAsText(file);
+              if(file.name.match("vtt")){
+                  reader.onload = function(e) {
+                      textProcessVTT(e.target.result);
+                  }
+              }else if(file.name.match("txt")){
+                  reader.onload = function(e) {
+                     textProcess(e.target.result);
+                  }
+              };
+           }
+        });
+  });
 }
 
 
 
+
+/* transform formatted time to seconds*/
+function reverseTime(time){
+    var timeArr=time.split(":");
+    var right=timeArr[2].split(".")[1];
+    var second=timeArr[2].split(".")[0];
+    time=timeArr[0]*3600+timeArr[1]*60+second+"."+right;
+    return time;
+}
+
+
+
+/*add video to the page and alter error if the file is not playable*/
+var URL = window.URL || window.webkitURL
+var displayMessage = function (message, isError) {
+    alert("Can't play this file");
+} 
+
+function addVideo(){
+  
+    $('#uploadVideo').trigger('click');
+    $('#uploadVideo').on('change',function(){
+     
+          var file = this.files[0]
+          var type = file.type
+          var videoNode = document.getElementById('video')
+          var canPlay = videoNode.canPlayType(type)
+          if (canPlay === '') canPlay = 'no'
+          var message = 'Can play type "' + type + '": ' + canPlay
+          var isError = canPlay === 'no'
+          if (isError) {
+            return
+          }
+          var fileURL = URL.createObjectURL(file)
+          videoNode.src = fileURL;
+  });   
+}
+
+/*Delete selected Text line */
+function deleteText(){
+
+  var thisLi=$(".oneline.li-selected");
+  track.removeCue(getCurrentCue());
+  thisLi.remove();
+}
+/*Edit selected Text line */
+function editText(){
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[2];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+ 
+  thisText.onkeypress=function(){
+          if(this.onkeypress.arguments[0].charCode == 13){
+            this.setAttribute("contenteditable","false");
+            var cue=getCurrentCue();
+             if(cue.text.match("<")){
+                var text=cue.text.match("(?=>).*(?=<)").substring(1);
+                var prefix=cue.text.split(text)[0];
+                var postfix=cue.text.split(text)[2];
+                cue.text=prefix+thisText.innerText+postfix;
+              }else{
+                cue.text=thisText.innerText
+              }
+            initialize_test();
+          } 
+        }
+}
+/*Edit selected line start time */
+function editStartTime(){
+
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[0];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+  thisText.onkeypress=function(){
+          if(this.onkeypress.arguments[0].charCode == 13){
+            var cue=getCurrentCue();
+            cue.startTime=reverseTime(thisText.innerText);
+            this.setAttribute("contenteditable","false");
+          } 
+        }
+}
+/*Edit selected line end time */
+function editEndTime(){
+
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[1];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+  thisText.onkeypress=function(){
+          if(this.onkeypress.arguments[0].charCode == 13){
+            var cue=getCurrentCue();
+            cue.endTime=reverseTime(thisText.innerText);
+            this.setAttribute("contenteditable","false");
+          } 
+        }
+}
+/*Edit comment*/
+function editComment(){
+
+  var thisLi=document.getElementsByClassName("li-selected");
+  var thisText=thisLi[0].children[3];
+  thisText.setAttribute("contenteditable","true");
+  placeCaretAtEnd( thisText );
+}
+
+/*Add a new line to the container*/
+function addLine(){
+
+   var parentNode=document.getElementById("contentDiv");
+   var thisLi=document.getElementsByClassName("li-selected");
+    parentNode.appendChild(createTextElement("00:00:00.000","00:00:00.000"," "," "));
+    var cue=new VTTCue(0,0,"");
+    cue.id=track.cues.length;
+    track.addCue(cue);
+    initialize_test();
+}
+
+
+
+
+/*Utility functions*/
+
+function myFunction() {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
 /*transform the time in seconds into the format that VTT file needs*/
 function timeProcess(time){
     if(time==0){
@@ -371,30 +283,6 @@ function timeProcess(time){
 }
 
 
-
-/*extra content in container and make it vtt file format*/
-function extraText(){
-  var parentNode=document.getElementById("contentDiv");
-  var track = video.textTracks[0];
-  var nodeList=parentNode.childNodes;
-  var i=0;
-
-  var startString="WEBVTT FILE"+"\n \n";
-  for(;i<track.cues.length;i++){
-
-    var startTime=timeProcess(track.cues[i].startTime);
-    var endTime=timeProcess(track.cues[i].endTime);
-    var text=track.cues[i].text;
-    var line=track.cues[i].line;
-    var position=track.cues[i].position;
-    var comment=nodeList[i].children[3].innerText;
-    var string="\nNOTE "+comment+"\n\n"
-                +startTime+"-->"+endTime+" line:"+line+" position:"+position+"\n"
-                +text+"\n";
-    startString=startString+string;
-  }
-  return startString;
-}
 /*When click the edit button,place the caret to the end of the text element */
 function placeCaretAtEnd(el) {
     el.focus();
@@ -413,7 +301,7 @@ function placeCaretAtEnd(el) {
         textRange.select();
     }
 }
-
+/*selectable*/
 $('#contentDiv').nuSelectable({
   items: '.oneline',
   selectionClass: 'nu-selection-box',

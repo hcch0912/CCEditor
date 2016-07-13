@@ -32,6 +32,9 @@ video{
 ::cue(.txt-lime){
 	color: lime;
 }
+::cue(.txt-black){
+	color: black;
+}
 ::cue(.bg-white){
 	background-color:white
 }
@@ -61,6 +64,9 @@ video{
 }
 ::cue(.bg-lime){
 	background-color: lime;
+}
+::cue(.bg-black){
+	background-color: black;
 }
 ::cue(.italic){
 	font-style: italic

@@ -1,4 +1,6 @@
-var video = document.querySelector('video');
+ var video = document.querySelector('video');
+ var colorArr=["white","red","yellow","green","blue","pink","purple","cyan","orange","lime","black"];
+
 
 function initialize_test(){
 
@@ -29,7 +31,7 @@ function initialize_test(){
     });
   $( "#cue-position-output" ).val( $( "#cue-position-input" ).slider( "value" ) );
 
-   var colorArr=["white","red","yellow","green","blue","pink","purple","cyan","orange","lime"];
+  
   $( "#color-input" ).slider({
       range: "min",
       value: 5,
@@ -39,10 +41,11 @@ function initialize_test(){
               $( "#color-output" ).val( colorArr[ui.value] );
               var cue=getCurrentCue();
               var prefix;
+              var text=cue.text;
               var color="txt-"+colorArr[ui.value];
-              if(cue.text.match("c\.|b\.|p\.")){
+              if(cue.text.match("<")){
                 prefix=cue.text.substring(0,cue.text.indexOf(">"));
-                cue.text=cue.text.substring(cue.text.indexOf(">")+1,cue.text.indexOf("</c>"));
+                text=cue.text.substring(cue.text.indexOf(">")+1,cue.text.lastIndexOf("<"));
                     if(prefix.match("txt-")){
                         var bgprefixIndex=prefix.indexOf("txt-");
                         var before=prefix.substring(0,bgprefixIndex);
@@ -62,7 +65,8 @@ function initialize_test(){
               }else{
                 prefix="<c.txt-"+colorArr[ui.value];
               }
-               cue.text =prefix+">"+cue.text+"</c>"
+              cue.text =prefix+">"+text+"</c>";
+
       }
     });
     $( "#bg-color-input" ).slider({
@@ -74,9 +78,10 @@ function initialize_test(){
               $( "#bg-color-output" ).val( colorArr[ui.value] );
               var cue=getCurrentCue();
               var prefix;
-              if(cue.text.match("c\.|b\.|p\.")){
+              var text=cue.text;
+              if(cue.text.match("<")){
                 prefix=cue.text.substring(0,cue.text.indexOf(">"));
-                cue.text=cue.text.substring(cue.text.indexOf(">")+1,cue.text.indexOf("</c>"));
+                text=cue.text.substring(cue.text.indexOf(">")+1,cue.text.lastIndexOf("<"));
                     if(prefix.match("bg-")){
                         var bgprefixIndex=prefix.indexOf("bg-");
                         var before=prefix.substring(0,bgprefixIndex);
@@ -96,12 +101,11 @@ function initialize_test(){
               }else{
                 prefix="<c.bg-"+colorArr[ui.value];
               }
-
-              cue.text =prefix+">"+cue.text+"</c>"
-             
+              cue.text =prefix+">"+text+"</c>";           
       }
     });
 }
+/*select a new line ,call this to update the global var*/
 
 function getCurrentCue(){
 
@@ -112,5 +116,72 @@ function getCurrentCue(){
       var cue = track.cues.getCueById(index);
       return cue;
 }
- 
 
+function getColorNo(currnetcue){
+  var txtColorNo=0;
+  var bgColorNo=0;
+  var txtColor="white";
+  var bgColor="black";
+  if(currnetcue){
+      var cueText=currnetcue.text;
+      /*if it has style tags*/
+      if(cueText.match("<*\.txt-.*|bg-.*")){
+        var prefix=cueText.substring(0,cueText.indexOf('>'));
+        if(prefix.match("\.txt-[a-z]*(\.|>)")){
+             txtColor=prefix.match("\.txt-[a-z]*(\.|>)")[0].substring(5);
+        }
+        if(prefix.match("bg-[a-z]*(\.|>)")){
+             bgColor=prefix.match("bg-[a-z]*(\.|>)")[0].substring(3);
+        }
+      }
+  }
+  var i=0;
+  for(;i<colorArr.length;i++){
+    if(txtColor.includes(colorArr[i])||txtColor==colorArr[i]){
+      txtColorNo=i;
+    }
+    if(bgColor.includes(colorArr[i])||bgColor==colorArr[i]){
+      bgColorNo=i;
+    }
+  }
+  return {"txtColor":txtColorNo,"bgColor":bgColorNo};
+}
+
+function updateSetting(cue){
+    var colors=getColorNo(cue);
+    var line=8;
+    var position=50;
+    if(Number.isInteger(cue.line)){
+      line=cue.line;
+    }
+    if(Number.isInteger(cue.position)){
+      position=cue.position;
+    }
+    $("#line-position-input").slider({
+      value:line
+    });
+    $("#cue-position-input").slider({
+      value:position
+    });
+    $("#color-input").slider({
+      value:colors.txtColor
+    });
+    $("#bg-color-input").slider({
+      value:colors.bgColor
+    });
+}
+
+function clearCue(){
+     var track = video.textTracks[0];
+     var length=track.cues.length;
+     var i=0;
+     for(;i<length;i++){
+        track.removeCue(track.cues[0]);
+     }  
+}
+function clearNode(){
+  var parentNode=document.getElementById("contentDiv");
+  if(parentNode.hasChildNodes()){
+      parentNode.innerHTML="";
+  }
+}
