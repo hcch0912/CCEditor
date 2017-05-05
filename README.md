@@ -1,9 +1,12 @@
 <snippet>
   <content>
-#CC/Subtitles Editor
+  
+# CC/Subtitles Editor
  For creating WebVTT files. Enable editors to create CC/Subtitles with GUI rather than writing complicated VTT codes.
+ 
 ## Installation
 DownLoad the Zip file and unzip it run the CCEditor.app (mac) CCEdit.exe(windows)
+
 ## Usage
   1. upload video
   2. upload txt file or insert element by clicking the "plus" buttom 
