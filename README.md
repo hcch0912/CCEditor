@@ -7,6 +7,10 @@
 ## Installation
 DownLoad the Zip file and unzip it run the CCEditor.app (mac) CCEdit.exe(windows)
 
+## Developer Instruction
+1.git clone the project
+2.npm start
+
 ## Usage
   1. upload video
   2. upload txt file or insert element by clicking the "plus" buttom 
